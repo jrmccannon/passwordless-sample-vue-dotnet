@@ -36,7 +36,7 @@ public class UserController : ControllerBase
 
         return response.IsSuccessStatusCode
             ? Ok(await response.Content.ReadFromJsonAsync<RegisterUserResponse>())
-            : new JsonResult(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+            : StatusCode(500, await response.Content.ReadFromJsonAsync<ProblemDetails>()); // whatever the 500 equiv is for ok()
     }
 
     [HttpPost("sign-in")]
@@ -45,9 +45,9 @@ public class UserController : ControllerBase
         var request = new VerifyUserRequest(token);
 
         var response = await Client.PostAsJsonAsync("signin/verify", request);
-
+        
         return response.IsSuccessStatusCode
             ? Ok(new { LoggedIn = true })
-            : new JsonResult(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+            : StatusCode(500, await response.Content.ReadFromJsonAsync<ProblemDetails>());
     }
 }
