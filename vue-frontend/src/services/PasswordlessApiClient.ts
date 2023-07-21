@@ -11,7 +11,6 @@ export async function SignInUser(username: string) {
 }
 
 export async function RegisterUser(token: string, alias: string) {
-  // Instantiate a passwordless client using your API public key.
   const p = new Client({
     apiKey: PasswordlessPublicKey,
   });
