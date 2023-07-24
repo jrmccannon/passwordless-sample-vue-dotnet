@@ -1,5 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Passwordless.SampleApi.DTOs;
+using Passwordless.Net;
 
 namespace Passwordless.SampleApi.Controllers;
 
@@ -8,46 +9,46 @@ namespace Passwordless.SampleApi.Controllers;
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> logger;
-    private static readonly HttpClient Client;
+    private readonly IPasswordlessClient passwordlessClient;
 
-    static UserController()
-    {
-        Client = new HttpClient();
-        Client.BaseAddress = new Uri("https://v4.passwordless.dev/");
-        Client.DefaultRequestHeaders.Add("ApiSecret", "");
-    }
-    
-    public UserController(ILogger<UserController> logger)
+    public UserController(ILogger<UserController> logger, IPasswordlessClient passwordlessClient)
     {
         this.logger = logger;
+        this.passwordlessClient = passwordlessClient;
     }
 
+    [AllowAnonymous]
     [HttpPost("create-token")]
-    public async Task<IActionResult> CreateToken([FromQuery]string user)
+    public async Task<IActionResult> CreateToken([FromQuery] string user)
     {
-        var request = new RegisterUserRequest
+        try
         {
-            UserId = Guid.NewGuid(),
-            UserName = user,
-            Aliases = new List<string> { user }
-        };
-
-        var response = await Client.PostAsJsonAsync("register/token", request);
-
-        return response.IsSuccessStatusCode
-            ? Ok(await response.Content.ReadFromJsonAsync<RegisterUserResponse>())
-            : StatusCode(500, await response.Content.ReadFromJsonAsync<ProblemDetails>()); // whatever the 500 equiv is for ok()
+            return Ok(await passwordlessClient.CreateRegisterToken(new RegisterOptions
+            {
+                UserId = Guid.NewGuid().ToString(),
+                Username = user,
+                Aliases = new HashSet<string> { user }
+            }));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occured registering user.");
+            return StatusCode(500, ex.Message);
+        }
     }
 
+    [AllowAnonymous]
     [HttpPost("sign-in")]
-    public async Task<IActionResult> SignIn([FromQuery]string token)
+    public async Task<IActionResult> SignIn([FromQuery] string token)
     {
-        var request = new VerifyUserRequest(token);
-
-        var response = await Client.PostAsJsonAsync("signin/verify", request);
-        
-        return response.IsSuccessStatusCode
-            ? Ok(new { LoggedIn = true })
-            : StatusCode(500, await response.Content.ReadFromJsonAsync<ProblemDetails>());
+        try
+        {
+            return Ok(await passwordlessClient.VerifyToken(token));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to verify user token.");
+            return StatusCode(500, ex.Message);
+        }
     }
 }

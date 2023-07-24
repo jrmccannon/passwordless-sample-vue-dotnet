@@ -19,7 +19,12 @@ builder.Services.AddCors(r =>
 builder.Services.AddControllers();
 builder.Services.AddTransient<IPenguinRepository, PenguinRepository>();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddPasswordlessSdk(options =>
+{
+    options.ApiSecret = builder.Configuration["Passwordless:ApiSecret"];
+    options.ApiUrl = builder.Configuration["Passwordless:ServerUrl"];
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
