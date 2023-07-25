@@ -43,7 +43,15 @@ public class UserController : ControllerBase
     {
         try
         {
-            return Ok(await passwordlessClient.VerifyToken(token));
+            var response = await passwordlessClient.VerifyToken(token);
+
+            if (response is { Success: true })
+            {
+                return Ok(new { LoggedIn = true });
+            }
+            
+            logger.LogError("Response was invalid {response}", response);
+            return StatusCode(500, "Something unexpected happened.");
         }
         catch (Exception ex)
         {
