@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Passwordless.Net;
+using Passwordless.SampleApi.Auth;
+using Passwordless.SampleApi.Models;
 
 namespace Passwordless.SampleApi.Controllers;
 
@@ -10,11 +12,14 @@ public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> logger;
     private readonly IPasswordlessClient passwordlessClient;
+    private readonly ITokenManager tokenManager;
 
-    public UserController(ILogger<UserController> logger, IPasswordlessClient passwordlessClient)
+    public UserController(ILogger<UserController> logger, IPasswordlessClient passwordlessClient,
+        ITokenManager tokenManager)
     {
         this.logger = logger;
         this.passwordlessClient = passwordlessClient;
+        this.tokenManager = tokenManager;
     }
 
     [AllowAnonymous]
@@ -47,7 +52,12 @@ public class UserController : ControllerBase
 
             if (response is { Success: true })
             {
-                return Ok(new { LoggedIn = true });
+                var jwt = tokenManager.GenerateToken(new User
+                {
+                    Id = response.UserId
+                });
+                
+                return Ok(new { LoggedIn = true, Token = jwt });
             }
             
             logger.LogError("Response was invalid {response}", response);

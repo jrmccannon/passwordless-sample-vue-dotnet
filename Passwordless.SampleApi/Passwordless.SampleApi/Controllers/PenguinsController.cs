@@ -20,6 +20,13 @@ public class PenguinsController : ControllerBase
     [HttpGet]
     public IActionResult GetPenguins()
     {
-        return Ok(repository.GetAll().Select(p => p.ToResponse()));
+        var penguins = repository.GetAll().ToList();
+
+        if (!penguins.Any())
+        {
+            return NoContent();
+        }
+
+        return Ok(penguins.Select(x => x.ToResponse()));
     }
 }
