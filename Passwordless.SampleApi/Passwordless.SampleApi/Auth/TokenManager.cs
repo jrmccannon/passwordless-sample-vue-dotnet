@@ -26,8 +26,7 @@ public class TokenManager : ITokenManager
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id),
-            new(ClaimTypes.Name, user.Name)
+            new(ClaimTypes.NameIdentifier, user.Id)
         };
 
         var descriptor = new SecurityTokenDescriptor
