@@ -25,6 +25,7 @@ async function login() {
 
   if (response.loggedIn === true) {
     store.loggedIn = true;
+    store.userToken = response.token;
     setTimeout(() => {
       router.push("/user");
     }, 1000);
