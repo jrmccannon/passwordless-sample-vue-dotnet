@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = builder.Configuration["Auth:Audience"],
             ValidIssuer = builder.Configuration["Auth:Issuer"],
             ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth:Secret"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Auth:Secret"]))
         };
     });
 

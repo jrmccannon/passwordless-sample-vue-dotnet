@@ -33,6 +33,8 @@ public class TokenManager : ITokenManager
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(7),
+            Issuer = configuration["Auth:Issuer"],
+            Audience = configuration["Auth:Audience"],
             SigningCredentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256Signature)
         };
 

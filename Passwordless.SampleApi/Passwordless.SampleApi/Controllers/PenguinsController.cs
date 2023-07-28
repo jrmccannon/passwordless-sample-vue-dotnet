@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Passwordless.SampleApi.Mappers;
 using Passwordless.SampleApi.Repositories;
@@ -18,6 +19,7 @@ public class PenguinsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult GetPenguins()
     {
         var penguins = repository.GetAll().ToList();

@@ -8,6 +8,7 @@ public static class PenguinMapper
     public static PenguinDTO ToResponse(this Penguin penguin) => new PenguinDTO
     {
         Name = penguin.Name,
-        ScientificName = penguin.ScientificName
+        ScientificName = penguin.ScientificName,
+        FavoriteFoods = penguin.FavoriteFood.Select(x => x)
     };
 }
