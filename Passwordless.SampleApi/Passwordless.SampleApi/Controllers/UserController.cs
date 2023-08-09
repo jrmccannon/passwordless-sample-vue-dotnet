@@ -28,7 +28,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            return Ok(await passwordlessClient.CreateRegisterToken(new RegisterOptions
+            return Ok(await passwordlessClient.CreateRegisterTokenAsync(new RegisterOptions
             {
                 UserId = Guid.NewGuid().ToString(),
                 Username = user,
@@ -48,7 +48,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            var response = await passwordlessClient.VerifyToken(token);
+            var response = await passwordlessClient.VerifyTokenAsync(token);
 
             if (response is { Success: true })
             {
