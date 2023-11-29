@@ -5,7 +5,14 @@ export async function SignIn(token: string) {
   return await fetch(SampleApiUrl + "/user/sign-in?token=" + token, {
     method: "POST",
   })
-    .then((r) => r.json())
+    .then((response) => {
+      console.log(response);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      return response.json();
+    })
     .catch((error) => {
       console.error(error);
     });
@@ -25,7 +32,7 @@ export async function Register(
       return response.json();
     })
     .then((r) => {
-      return new SuccessfulRegistrationResponse(r);
+      return new SuccessfulRegistrationResponse(r.token);
     })
     .catch((error) => new ErrorRegistrationResponse(error));
 }
